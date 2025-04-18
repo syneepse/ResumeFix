@@ -140,10 +140,5 @@ stringData:
   google-client-id: "<insert-your-google-client-id-here>"
   google-client-secret: "<insert-your-google-client-secret-here>"
   google-callback-url: "<insert-your-google-callback-url-here>"
-  # Add more variables as needed
 
-  google-client-id: "<insert-your-google-client-id-here>"
-  google-client-secret: "<insert-your-google-client-secret-here>"
-  google-callback-url: "<insert-your-google-callback-url-here>"
-  # Add more variables as needed
 
