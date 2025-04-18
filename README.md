@@ -149,7 +149,7 @@ Resume Skill Extractor is a full-stack web application for uploading, analyzing,
 
 **Typical variables to set:**
 - Backend: `JWT_SECRET`, `GEMINI_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL`, `DATABASE_URL` (if not using default)
-- Frontend: `NEXT_PUBLIC_API_URL`, `NEXTAUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+- Frontend: `NEXT_PUBLIC_API_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
 
 > Add or remove variables as your project requires. All sensitive data should be managed this way for security and flexibility.
 
