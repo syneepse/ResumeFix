@@ -1,0 +1,24 @@
+/* ResumeCardScrollbar.css */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #a5b4fc #e5e7eb; /* thumb color, track color */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  background: #e5e7eb;
+  border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #a5b4fc;
+  border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6366f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}

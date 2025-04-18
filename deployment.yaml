@@ -1,0 +1,149 @@
+# Kubernetes Deployment for Resume Skill Extractor
+
+---
+# Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resume-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resume-backend
+  template:
+    metadata:
+      labels:
+        app: resume-backend
+    spec:
+      containers:
+      - name: resume-backend
+        image: your-docker-repo/resume-backend:latest
+        ports:
+        - containerPort: 3001
+        env:
+        - name: FRONTEND_ORIGIN
+          value: "http://resume-frontend:3000"
+        - name: DATABASE_URL
+          value: "file:/data/resume.sqlite"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: resume-secrets
+              key: jwt-secret
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: resume-secrets
+              key: gemini-api-key
+        volumeMounts:
+        - name: resume-sqlite-pv
+          mountPath: /data
+        - name: uploads-pv
+          mountPath: /app/uploads
+      volumes:
+      - name: resume-sqlite-pv
+        persistentVolumeClaim:
+          claimName: resume-sqlite-pvc
+      - name: uploads-pv
+        persistentVolumeClaim:
+          claimName: uploads-pvc
+---
+# Backend NodePort Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: resume-backend
+spec:
+  type: NodePort
+  selector:
+    app: resume-backend
+  ports:
+    - protocol: TCP
+      port: 3001
+      targetPort: 3001
+      nodePort: 32001
+---
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resume-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resume-frontend
+  template:
+    metadata:
+      labels:
+        app: resume-frontend
+    spec:
+      containers:
+      - name: resume-frontend
+        image: your-docker-repo/resume-frontend:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: NEXT_PUBLIC_API_URL
+          value: "http://resume-backend:3001"
+---
+# Frontend NodePort Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: resume-frontend
+spec:
+  type: NodePort
+  selector:
+    app: resume-frontend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 32000
+---
+# Persistent Volume Claims
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: resume-sqlite-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+# Kubernetes Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: resume-secrets
+  namespace: default
+stringData:
+  jwt-secret: "<insert-your-jwt-secret-here>"
+  gemini-api-key: "<insert-your-gemini-api-key-here>"
+  google-client-id: "<insert-your-google-client-id-here>"
+  google-client-secret: "<insert-your-google-client-secret-here>"
+  google-callback-url: "<insert-your-google-callback-url-here>"
+  # Add more variables as needed
+
+  google-client-id: "<insert-your-google-client-id-here>"
+  google-client-secret: "<insert-your-google-client-secret-here>"
+  google-callback-url: "<insert-your-google-callback-url-here>"
+  # Add more variables as needed
+

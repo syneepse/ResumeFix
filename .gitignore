@@ -1,0 +1,6 @@
+# Ignore uploaded resume files
+back-end/uploads/
+
+# Ignore node_modules folders
+node_modules/
+**/node_modules/

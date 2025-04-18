@@ -1,0 +1,73 @@
+.animate-fade-slide-in {
+  animation: fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-fade-slide-out {
+  animation: fadeSlideOut 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeSlideOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(30px); }
+}
+
+.animate-pulse-once {
+  animation: pulseOnce 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes pulseOnce {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+/* Modal Animations */
+.modal-animate-in {
+  animation: modalIn 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+.modal-animate-out {
+  animation: modalOut 0.28s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes modalOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.92); }
+}
+.modal-backdrop-in {
+  animation: backdropIn 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+.modal-backdrop-out {
+  animation: backdropOut 0.28s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes backdropOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Add/Cancel Button Animations */
+.rotate-45 {
+  transform: rotate(45deg);
+}
+.rotate-0 {
+  transform: rotate(0deg);
+}
+.opacity-0 {
+  opacity: 0;
+}
+.opacity-100 {
+  opacity: 1;
+}
+.transition-transform {
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.transition-opacity {
+  transition: opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
