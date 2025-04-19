@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+// const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function AuthSection() {
   interface UserInfo {
@@ -23,7 +23,7 @@ export default function AuthSection() {
     let mounted = true;
     async function fetchUser() {
       try {
-        const res = await fetch(`${API_URL}/me`, {
+        const res = await fetch(`/api/me`, {
           credentials: 'include',
         });
         if (res.ok) {
@@ -44,7 +44,7 @@ export default function AuthSection() {
 
   const handleSignOut = async () => {
     // Call backend to clear the HttpOnly cookie
-    await fetch(`${API_URL}/logout`, { credentials: 'include', method: 'POST' });
+    await fetch(`/api/logout`, { credentials: 'include', method: 'POST' });
     setUserInfo(null);
     router.push('/');
   };
@@ -58,7 +58,7 @@ export default function AuthSection() {
     return (
       <div className="flex gap-2">
         <a
-          href={`${API_URL}/auth/google`}
+          href={`/api/auth/google`}
           className="px-4 py-1 rounded bg-blue-500 hover:bg-blue-700 text-white font-semibold text-sm shadow-sm"
         >
           Sign in with Google

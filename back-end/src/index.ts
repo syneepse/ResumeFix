@@ -131,7 +131,7 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
   res.cookie('jwt', token, {
     httpOnly: true,
     secure: true,
-    sameSite: 'none',
+    sameSite: 'lax',
     maxAge: 2 * 60 * 60 * 1000,
     path: '/',
   });
@@ -335,6 +335,10 @@ app.get('/resumes/:id', authenticateToken, async (req: Request, res: Response) =
 
 // --- /me endpoint: return user info if authenticated ---
 app.get('/me', (req: Request, res: Response) => {
+  // Debug logging for authentication issues
+  console.log('Cookies:', req.cookies);
+  console.log('JWT Secret:', JWT_SECRET);
+  console.log('Token:', req.cookies.jwt);
   const token = req.cookies.jwt;
   if (!token) {res.status(401).json({ error: 'Not authenticated' }); return;}
   jwt.verify(token, JWT_SECRET, (err: unknown, user: unknown) => {

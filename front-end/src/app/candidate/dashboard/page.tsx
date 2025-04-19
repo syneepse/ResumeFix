@@ -124,7 +124,7 @@ const [user, setUser] = useState<User | null>(null);
 
   const handleDeleteResume = async (id: number): Promise<void> => {
     try {
-      await axios.delete(`${API_URL}/resumes/${id}`, { withCredentials: true });
+      await axios.delete(`/api/resumes/${id}`, { withCredentials: true });
       fetchResumes();
     } catch (error) {
       console.error(error);
@@ -133,7 +133,7 @@ const [user, setUser] = useState<User | null>(null);
 
   const handleDownloadResume = async (id: number): Promise<void> => {
     try {
-      const response = await axios.get(`${API_URL}/resumes/${id}/download`, {
+      const response = await axios.get(`/api/resumes/${id}/download`, {
         withCredentials: true,
         responseType: 'blob',
       });
