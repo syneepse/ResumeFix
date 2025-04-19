@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: resume-backend
-        image: resume-backend:latest
+        image: synaepse/resume-backend:latest
         ports:
         - containerPort: 3001
         env:
@@ -81,7 +81,7 @@ spec:
     spec:
       containers:
       - name: resume-frontend
-        image: resume-frontend:latest
+        image: synaepse/resume-frontend:latest
         ports:
         - containerPort: 3000
         env:
