@@ -1,6 +1,7 @@
 // src/app/components/NavBar.tsx
 "use client";
 import { useSession, signOut } from "next-auth/react";
+import Image from "next/image";
 
 export default function NavBar({ appName }: { appName: string }) {
   const { data: session } = useSession();
@@ -11,10 +12,13 @@ export default function NavBar({ appName }: { appName: string }) {
       </div>
       <div className="flex items-center gap-4">
         {session?.user?.image && (
-          <img
+          <Image
             src={session.user.image}
             alt="Profile"
+            width={32}
+            height={32}
             className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600"
+            unoptimized
           />
         )}
         <button

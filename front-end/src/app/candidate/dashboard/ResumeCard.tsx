@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import DownloadIcon from '@mui/icons-material/Download';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import './ResumeCardAnimations.css';
 import './ResumeCardHideScrollbar.css';
@@ -35,7 +34,7 @@ const ResumeCard: React.FC<ResumeCardProps> = ({
   work_experience
 }) => {
   const [expanded, setExpanded] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  // const [showConfirm, setShowConfirm] = useState(false); // Removed unused variable
   const [confirmVisible, setConfirmVisible] = useState(false); // controls DOM presence
   const [modalAnim, setModalAnim] = useState<'in' | 'out'>('in');
   const [deleting, setDeleting] = useState(false);
@@ -45,13 +44,13 @@ const ResumeCard: React.FC<ResumeCardProps> = ({
   const openConfirm = () => {
     setConfirmVisible(true);
     setModalAnim('in');
-    setTimeout(() => setShowConfirm(true), 10); // allow render
+    // setTimeout(() => setShowConfirm(true), 10); // allow render
   };
 
   // Close modal with animation
   const closeConfirm = () => {
     setModalAnim('out');
-    setShowConfirm(false);
+    // setShowConfirm(false);
     setTimeout(() => setConfirmVisible(false), 280); // match animation duration
   };
 

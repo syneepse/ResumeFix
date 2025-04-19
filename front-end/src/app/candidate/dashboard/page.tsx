@@ -76,11 +76,18 @@ export default function CandidateDashboard() {
         headers: { Authorization: `Bearer ${jwt}` },
       });
       // Normalize backend fields to frontend expectations
-      const normalized = (res.data as any[]).map(r => ({
-        ...r,
-        fileName: r.filename,
-        uploadDate: r.upload_date,
-        summary: r.summary
+      const normalized = (res.data as Array<Record<string, unknown>>).map(r => ({
+        id: r["id"] as number,
+        name: r["name"] as string ?? "",
+        email: r["email"] as string ?? "",
+        phone: r["phone"] as string ?? "",
+        fileName: r["filename"] as string ?? "",
+        uploadDate: r["upload_date"] as string ?? "",
+        skills: (r["skills"] as string[]) ?? [],
+        summary: r["summary"] as string ?? "",
+        work_experience: r["work_experience"] as string ?? "",
+        matchedSkills: (r["matchedSkills"] as string[]) ?? [],
+        rating: r["rating"] as string ?? "",
       }));
 
       setResumes(normalized);
@@ -103,7 +110,7 @@ export default function CandidateDashboard() {
   }, []);
   
 
-  useEffect(() => { if (!loading && jwt) fetchResumes(); }, [jwt, loading]);
+  useEffect(() => { if (!loading && jwt) fetchResumes(); }, [jwt, loading, fetchResumes]);
   if (loading) return <div>Loading...</div>;
   if (!jwt) return <div>Please sign in to access your dashboard.</div>;
 

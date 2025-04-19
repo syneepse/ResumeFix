@@ -7,7 +7,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function AuthSection() {
   const [jwt, setJwt] = useState<string | null>(typeof window !== 'undefined' ? localStorage.getItem('jwt') : null);
-  const [userInfo, setUserInfo] = useState<any>(null);
+  interface UserInfo {
+  displayName?: string;
+  emails?: { value: string }[];
+  [key: string]: unknown;
+}
+const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -19,7 +24,7 @@ export default function AuthSection() {
           return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
         setUserInfo(JSON.parse(jsonPayload));
-      } catch (e) {
+      } catch {
         setUserInfo(null);
       }
     } else {
