@@ -23,7 +23,7 @@ export default function AuthSection() {
     let mounted = true;
     async function fetchUser() {
       try {
-        const res = await fetch(`${API_URL}/me`, {
+        const res = await fetch(`${API_URL}`, {
           credentials: 'include',
         });
         if (res.ok) {

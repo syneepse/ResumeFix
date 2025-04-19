@@ -8,7 +8,7 @@ import { AddResumeIcon, CloseIcon } from "./icons";
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import React from 'react';
-const API_URL = 'http://localhost:5000'; // now points to Express backend
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // now points to Express backend
 
 type Resume = {
   id: number;

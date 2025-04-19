@@ -13,9 +13,10 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
+    "@netlify/next": "^1.4.9",
+    "@netlify/plugin-nextjs": "^5.10.7",
     "axios": "^1.8.4",
     "next": "15.3.0",
-
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
