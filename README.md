@@ -22,15 +22,11 @@ Resume Skill Extractor is a full-stack web application for uploading, analyzing,
 
 ### DevOps
 - **Containerization:** Docker
-- **Orchestration:** Kubernetes
 
 ---
 
 ## 2. API Reference (Backend)
 
-### Authentication
-- `GET /auth/google` – Initiate Google OAuth2 login
-- `GET /auth/google/callback` – OAuth2 callback, issues JWT
 
 ### Resume Management
 - `POST /resumes/upload` (Authenticated)
@@ -78,93 +74,44 @@ Resume Skill Extractor is a full-stack web application for uploading, analyzing,
 
 ### Prerequisites
 - **Docker** (v20+)
-- **kubectl** (for Kubernetes)
-- **Node.js** (v18+) and **npm** (for local development)
 
-### 5.1. On Windows, Mac, or Linux
+### Steps to Deploy
 
-#### a) Install Docker
-- **Windows/Mac:** [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- **Linux:**
-  ```sh
-  sudo apt-get update
-  sudo apt-get install -y docker.io
-  sudo systemctl enable --now docker
-  ```
+1. **Clone the Repository**
+   ```sh
+   git clone <this-repo-url>
+   cd ResumeFix
+   ```
+2. **Configure Environment Variables**
+   - Open `docker-compose.yaml`.
+   - Set the required environment variables under the `environment` section for both `backend` and `frontend` services. **Do not commit sensitive values.**
 
-#### b) Install kubectl
-- [Official instructions](https://kubernetes.io/docs/tasks/tools/)
-- **Linux example:**
-  ```sh
-  curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-  chmod +x ./kubectl
-  sudo mv ./kubectl /usr/local/bin/kubectl
-  ```
+   **Required Environment Variables:**
+   - Backend:
+     - `GOOGLE_CLIENT_ID`
+     - `GOOGLE_CLIENT_SECRET`
+     - `GOOGLE_CALLBACK_URL`
+     - `JWT_SECRET`
+     - `DATABASE_URL`
+     - `GEMINI_API_KEY`
+     - `FRONTEND_ORIGIN`
+   - Frontend:
+     - `NEXT_PUBLIC_API_URL`
 
-#### c) Build and Push Docker Images
-- Backend:
-  ```sh
-  docker build -t your-docker-repo/resume-backend:latest .
-  docker push your-docker-repo/resume-backend:latest
-  ```
-- Frontend:
-  ```sh
-  docker build -f Dockerfile.frontend -t your-docker-repo/resume-frontend:latest .
-  docker push your-docker-repo/resume-frontend:latest
-  ```
+3. **Start the Application**
+   ```sh
+   docker-compose up
+   ```
+   - This will build and start both frontend (on port 3000) and backend (on port 5000).
 
-#### d) Configure Secrets (All Environment Variables)
-- All environment variables from `.env` files (frontend and backend) should be set dynamically via Kubernetes secrets.
-- Edit `deployment.yaml` and add your secrets to the `resume-secrets` Secret. Example:
-  ```yaml
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: resume-secrets
-    namespace: default
-  stringData:
-    jwt-secret: "<insert-your-jwt-secret-here>"
-    gemini-api-key: "<insert-your-gemini-api-key-here>"
-    google-client-id: "<insert-your-google-client-id-here>"
-    google-client-secret: "<insert-your-google-client-secret-here>"
-    google-callback-url: "<insert-your-google-callback-url-here>"
-    # Add more variables as needed
-  ```
-- Reference these secrets in your backend and frontend deployment `env` sections using `valueFrom.secretKeyRef`. Example:
-  ```yaml
-  env:
-    - name: JWT_SECRET
-      valueFrom:
-        secretKeyRef:
-          name: resume-secrets
-          key: jwt-secret
-    - name: GOOGLE_CLIENT_ID
-      valueFrom:
-        secretKeyRef:
-          name: resume-secrets
-          key: google-client-id
-    # ...and so on for all variables
-  ```
-- No sensitive values are hardcoded in code or Dockerfiles. All configuration is managed securely via Kubernetes.
-
-**Typical variables to set:**
-- Backend: `JWT_SECRET`, `GEMINI_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL`, `DATABASE_URL` (if not using default)
-- Frontend: `NEXT_PUBLIC_API_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
-
-> Add or remove variables as your project requires. All sensitive data should be managed this way for security and flexibility.
-
-#### e) Deploy to Kubernetes
-- Apply the deployment manifest:
-  ```sh
-  kubectl apply -f deployment.yaml
-  ```
-
-#### f) Access the Application
-- The frontend will be exposed on **NodePort 32000** (http://<your-node-ip>:32000)
-- The backend will be exposed on **NodePort 32001** (http://<your-node-ip>:32001)
-- You can change these ports in `deployment.yaml` if needed.
+4. **Access the Application**
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - Backend: [http://localhost:5000](http://localhost:5000)
 
 ---
+
+> For advanced deployment (Kubernetes, cloud, etc.), refer to previous versions or reach out to the maintainer.
+
 
 ## 6. Credits
 

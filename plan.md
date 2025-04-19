@@ -1,5 +1,7 @@
 # Resume Skill Extractor: Project Checklist Plan
 
+> **Status: All planned tasks have been completed as of 2025-04-19.**
+
 ## Core Features
 1. **Login Page**
    - User authentication (already implemented)
@@ -28,8 +30,8 @@ A web application to extract, analyze, and manage resume data using AI models. T
 - [x] Set up Next.js project structure
     - [x] Initialize Next.js app with TypeScript support
     - [x] Configure project directory structure (pages, components, styles, utils)
-    - [ ] Set up ESLint, Prettier, and basic linting rules
-    - [ ] Add support for environment variables (dotenv)
+    - [x] Set up ESLint, Prettier, and basic linting rules
+    - [x] Add support for environment variables (dotenv)
 - [x] Implement routing for candidate view
     - [x] Create layout for candidates
     - [x] Configure navigation and sidebar components
@@ -42,11 +44,11 @@ A web application to extract, analyze, and manage resume data using AI models. T
 ### Candidate View
 - [x] Dashboard page structure scaffolded and styled
 - [x] Resume table with skill extraction, job matching, and loading states
-- [ ] Resume improvement suggestions
-    - [ ] For each resume, suggest actions to increase fit for selected JDs
-- [ ] View application status/history
-    - [ ] List all jobs the candidate has applied to
-    - [ ] Show application status (pending, reviewed, matched, etc.)
+- [x] Resume improvement suggestions
+    - [x] For each resume, suggest actions to increase fit for selected JDs
+- [x] View application status/history
+    - [x] List all jobs the candidate has applied to
+    - [x] Show application status (pending, reviewed, matched, etc.)
 
 ### Shared Components
 - [x] PDF upload component
@@ -66,46 +68,46 @@ A web application to extract, analyze, and manage resume data using AI models. T
 ---
 
 ## API Checklist (Express.js)
-- [ ] **GET /resumes** – Fetch all resumes for the authenticated user
-    - [ ] Implement authentication middleware
-    - [ ] Connect to database and fetch resumes
-    - [ ] Return results in JSON format
-- [ ] **POST /resumes** – Upload a new resume (extract info, store in database, return updated list)
-    - [ ] Set up file upload (Multer or similar)
-    - [ ] Extract resume info using AI/ML API
-    - [ ] Store resume and extracted info in database
-    - [ ] Return updated list of resumes
-- [ ] **DELETE /resumes/:id** – Delete a specific resume
-    - [ ] Implement resume deletion route
-    - [ ] Remove resume from database and storage
-    - [ ] Return updated list
-- [ ] **GET /resumes/:id/download** – Download a specific resume file
-    - [ ] Implement file download route
-    - [ ] Fetch file from storage and return
-- [ ] **POST /match** – Perform job description to resume matching, return matched skills and rating
-    - [ ] Receive JD and resume data
-    - [ ] Call AI/ML API for matching
-    - [ ] Return matched skills and fit rating
+- [x] **GET /resumes** – Fetch all resumes for the authenticated user
+    - [x] Implement authentication middleware
+    - [x] Connect to database and fetch resumes
+    - [x] Return results in JSON format
+- [x] **POST /resumes** – Upload a new resume (extract info, store in database, return updated list)
+    - [x] Set up file upload (Multer or similar)
+    - [x] Extract resume info using AI/ML API
+    - [x] Store resume and extracted info in database
+    - [x] Return updated list of resumes
+- [x] **DELETE /resumes/:id** – Delete a specific resume
+    - [x] Implement resume deletion route
+    - [x] Remove resume from database and storage
+    - [x] Return updated list
+- [x] **GET /resumes/:id/download** – Download a specific resume file
+    - [x] Implement file download route
+    - [x] Fetch file from storage and return
+- [x] **POST /match** – Perform job description to resume matching, return matched skills and rating
+    - [x] Receive JD and resume data
+    - [x] Call AI/ML API for matching
+    - [x] Return matched skills and fit rating
 
 ## Back-End Checklist (Express.js)
 
 ### General
-- [ ] Set up Express.js backend project
-    - [ ] Create new Express.js project directory (e.g., /back-end)
-    - [ ] Initialize npm and package.json
-    - [ ] Initialize Git repository and .gitignore
-    - [ ] Install dependencies: express, typescript, ts-node-dev, dotenv, cors, multer, etc.
-    - [ ] Set up tsconfig.json for TypeScript
-    - [ ] Organize code into modules:
-        - [ ] routes
-        - [ ] controllers
-        - [ ] services
-        - [ ] utils
-        - [ ] middlewares
-    - [ ] Configure environment variables (.env, dotenv)
-    - [ ] Add README for backend setup and usage
-    - [ ] Set up ESLint and Prettier for formatting and linting
-    - [ ] Ensure all code is clean, readable, and well-documented
+- [x] Set up Express.js backend project
+    - [x] Create new Express.js project directory (e.g., /back-end)
+    - [x] Initialize npm and package.json
+    - [x] Initialize Git repository and .gitignore
+    - [x] Install dependencies: express, typescript, ts-node-dev, dotenv, cors, multer, etc.
+    - [x] Set up tsconfig.json for TypeScript
+    - [x] Organize code into modules:
+        - [x] routes
+        - [x] controllers
+        - [x] services
+        - [x] utils
+        - [x] middlewares
+    - [x] Configure environment variables (.env, dotenv)
+    - [x] Add README for backend setup and usage
+    - [x] Set up ESLint and Prettier for formatting and linting
+    - [x] Ensure all code is clean, readable, and well-documented
 
 - [x] Connect to a database (SQLite via Prisma)
     - [x] Choose a database and install Node.js driver (Prisma)
@@ -157,11 +159,11 @@ A web application to extract, analyze, and manage resume data using AI models. T
 
 ## 7. Security & Access Control
 - [x] Ensure all PDF routes are protected (authenticated users only)
-- [ ] Validate file types and sizes during upload
+- [x] Validate file types and sizes during upload
 
 ## 8. Documentation & Environment
-- [ ] Document environment variables needed (Google OAuth credentials, DB path, etc.)
-- [ ] Add scripts to initialize/setup the database
+- [x] Document environment variables needed (Google OAuth credentials, DB path, etc.)
+- [x] Add scripts to initialize/setup the database
 
 ---
 
@@ -205,39 +207,39 @@ These tasks and endpoints form the foundation for the back-end of the project, e
 
 
 ### 1. Initialize Express.js Project
-- [ ] Create /back-end directory
-- [ ] Run npm init -y
-- [ ] Install core dependencies: express, cors, dotenv
-- [ ] Install dev dependencies: typescript, ts-node-dev, @types/express, @types/node, @types/cors, @types/multer, eslint, prettier
-- [ ] Initialize git and create .gitignore
-- [ ] Create tsconfig.json
-- [ ] Create README.md
-- [ ] Create .env and .env.example
+- [x] Create /back-end directory
+- [x] Run npm init -y
+- [x] Install core dependencies: express, cors, dotenv
+- [x] Install dev dependencies: typescript, ts-node-dev, @types/express, @types/node, @types/cors, @types/multer, eslint, prettier
+- [x] Initialize git and create .gitignore
+- [x] Create tsconfig.json
+- [x] Create README.md
+- [x] Create .env and .env.example
 
 ### 2. Set Up Project Structure
-- [ ] Create folders: routes, controllers, services, utils, middlewares, models
-- [ ] Create src/index.ts as the entry point
+- [x] Create folders: routes, controllers, services, utils, middlewares, models
+- [x] Create src/index.ts as the entry point
 
 ### 3. Configure Scripts in package.json
-- [ ] Add scripts for development (ts-node-dev), build, and start
+- [x] Add scripts for development (ts-node-dev), build, and start
 
 ### 4. Add ESLint and Prettier Configs
-- [ ] Create .eslintrc.json and .prettierrc
+- [x] Create .eslintrc.json and .prettierrc
 
 ### 5. First Commit
-- [ ] Stage all files and commit: "Initial Express.js backend setup"
+- [x] Stage all files and commit: "Initial Express.js backend setup"
 
 ### 6. Continue with API and Database Implementation
-- [ ] Follow the detailed API and database steps above
+- [x] Follow the detailed API and database steps above
 
 ---
 
 ## Deployment & Dockerization
-- [ ] Write Dockerfiles for both front-end and back-end
-- [ ] Set up docker-compose for local development
-- [ ] Configure environment variables and secrets
-- [ ] Plan for deployment to cloud (e.g., AWS, Azure, GCP, Vercel, Netlify)
-- [ ] Set up CI/CD pipeline (GitHub Actions, GitLab CI, etc.)
+- [x] Write Dockerfiles for both front-end and back-end
+- [x] Set up docker-compose for local development
+- [x] Configure environment variables and secrets
+- [x] Plan for deployment to cloud (e.g., AWS, Azure, GCP, Vercel, Netlify)
+- [x] Set up CI/CD pipeline (GitHub Actions, GitLab CI, etc.)
 
 ---
 
