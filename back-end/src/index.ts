@@ -130,7 +130,7 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '2h' });
   res.cookie('jwt', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
     sameSite: 'none',
     maxAge: 2 * 60 * 60 * 1000,
     path: '/',
