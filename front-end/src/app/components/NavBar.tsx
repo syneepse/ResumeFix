@@ -1,7 +1,7 @@
 // src/app/components/NavBar.tsx
 "use client";
 import AuthSection from "./AuthSection";
-import Image from "next/image";
+
 
 export default function NavBar({ appName }: { appName: string }) {
   // const { data: session } = useSession();

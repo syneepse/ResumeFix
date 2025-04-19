@@ -93,7 +93,13 @@ export default function CandidateDashboard() {
     }
   };
 
-  const [user, setUser] = useState<any>(null);
+  interface User {
+  id?: string;
+  displayName?: string;
+  email?: string;
+  picture?: string;
+}
+const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
