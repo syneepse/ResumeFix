@@ -4,6 +4,8 @@ WORKDIR /app
 COPY back-end/package*.json ./
 RUN npm install 
 COPY back-end .
+# Generate Prisma client
+RUN npx prisma generate
 # Build the app (prisma generate + tsc)
 RUN npm run build
 # Ensure the uploads directory exists
