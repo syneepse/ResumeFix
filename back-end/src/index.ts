@@ -131,7 +131,7 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
   res.cookie('jwt', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'none',
     maxAge: 2 * 60 * 60 * 1000,
     path: '/',
   });
