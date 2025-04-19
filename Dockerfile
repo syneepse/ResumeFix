@@ -11,6 +11,7 @@ RUN npm run build
 # Ensure the uploads directory exists
 RUN mkdir -p /app/uploads
 VOLUME ["/app/uploads"]
+RUN cp -r /app/src/generated /app/dist/generated
 ENV NODE_ENV=production
 EXPOSE 3001
 CMD ["node", "dist/index.js"]
