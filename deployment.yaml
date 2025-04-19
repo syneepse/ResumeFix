@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: resume-backend
-        image: your-docker-repo/resume-backend:latest
+        image: resume-backend:latest
         ports:
         - containerPort: 3001
         env:
@@ -81,7 +81,7 @@ spec:
     spec:
       containers:
       - name: resume-frontend
-        image: your-docker-repo/resume-frontend:latest
+        image: resume-frontend:latest
         ports:
         - containerPort: 3000
         env:
