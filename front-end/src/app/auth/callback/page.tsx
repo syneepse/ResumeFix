@@ -7,10 +7,9 @@ function AuthCallbackInner(){
   const searchParams = useSearchParams();
   useEffect(() => {
     const token = searchParams.get("token");
+    // NOTE: The backend should set the JWT as an HttpOnly, Secure cookie during the OAuth callback redirect.
+    // The frontend should NOT set the JWT cookie via JavaScript for security reasons.
     if (token) {
-      document.cookie = `jwt=${token}; path=/;`;
-      // Optionally keep localStorage for legacy, or remove the line below if not needed
-      // localStorage.setItem("jwt", token);
       router.replace("/candidate/dashboard"); // Redirect to candidate dashboard after login
     }
   }, [searchParams, router]);

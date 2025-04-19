@@ -4,6 +4,10 @@ import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// For type safety, install @types/cookie-parser if not present
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import { PrismaClient } from './generated/prisma';
 import multer from 'multer';
@@ -50,13 +54,29 @@ dotenv.config();
 const app = express();
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:3000', credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(session({ secret: process.env.JWT_SECRET || 'supersecret', resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 
-import { authenticateToken } from './middleware/auth';
+// Updated authenticateToken middleware to read JWT from cookie
+function authenticateToken(req: Request, res: Response, next: NextFunction): void {
+  const token = req.cookies.jwt;
+  if (!token) {
+    res.status(401).json({ error: 'Missing token' });
+    return;
+  }
+  jwt.verify(token, JWT_SECRET, (err: unknown, user: unknown) => {
+    if (err) {
+      res.status(403).json({ error: 'Invalid token' });
+      return;
+    }
+    (req as any).user = user;
+    next();
+  });
+}
 
 // Passport Google OAuth2 setup
 passport.use(new GoogleStrategy({
@@ -99,17 +119,23 @@ passport.deserializeUser((user: Express.User, done: (err: any, user?: Express.Us
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req: Request, res: Response) => {
-  // On successful auth, issue JWT and redirect to frontend
+  // On successful auth, issue JWT and set as HttpOnly cookie, then redirect to frontend dashboard
   const user = (req as any).user;
   const payload = {
     id: user.id,
-    displayName: user.displayName,
-    emails: user.emails,
-    provider: user.provider
+    displayName: user.name,
+    email: user.email,
+    picture: user.avatar_url,
   };
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '2h' });
-  // Redirect to frontend with token as query param (or set cookie in production)
-  res.redirect(`http://localhost:3000/auth/callback?token=${token}`);
+  res.cookie('jwt', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 2 * 60 * 60 * 1000,
+    path: '/',
+  });
+  res.redirect((process.env.FRONTEND_ORIGIN || 'http://localhost:3000') + '/candidate/dashboard');
 });
 
 // POST /resumes/upload – Upload a PDF and save metadata
@@ -305,6 +331,28 @@ app.get('/resumes/:id', authenticateToken, async (req: Request, res: Response) =
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch resume', detail: err });
   }
+});
+
+// --- /me endpoint: return user info if authenticated ---
+app.get('/me', (req: Request, res: Response) => {
+  const token = req.cookies.jwt;
+  if (!token) {res.status(401).json({ error: 'Not authenticated' }); return;}
+  jwt.verify(token, JWT_SECRET, (err: unknown, user: unknown) => {
+    if (err || !user || typeof user !== 'object') {res.status(401).json({ error: 'Invalid token' }); return;}
+    const { id, displayName, email, picture } = user as { id?: string, displayName?: string, email?: string, picture?: string };
+    res.json({ id, displayName, email, picture });
+  });
+});
+
+// --- /logout endpoint: clear JWT cookie ---
+app.post('/logout', (req: Request, res: Response) => {
+  res.clearCookie('jwt', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+  });
+  res.json({ message: 'Logged out' });
 });
 
 if (process.env.NODE_ENV !== 'test') {

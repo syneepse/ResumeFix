@@ -6,60 +6,75 @@ import { useRouter } from "next/navigation";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function AuthSection() {
-  const [jwt, setJwt] = useState<string | null>(typeof window !== 'undefined' ? localStorage.getItem('jwt') : null);
   interface UserInfo {
-  displayName?: string;
-  emails?: { value: string }[];
-  [key: string]: unknown;
-}
-const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+    displayName?: string;
+    emails?: { value: string }[];
+    name?: string;
+    email?: string;
+    picture?: string;
+    [key: string]: unknown;
+  }
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // Only fetch user info once on mount
   useEffect(() => {
-    if (jwt) {
+    let mounted = true;
+    async function fetchUser() {
       try {
-        const base64Url = jwt.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        setUserInfo(JSON.parse(jsonPayload));
+        const res = await fetch(`${API_URL}/me`, {
+          credentials: 'include',
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (mounted) setUserInfo(data);
+        } else {
+          if (mounted) setUserInfo(null);
+        }
       } catch {
-        setUserInfo(null);
+        if (mounted) setUserInfo(null);
+      } finally {
+        if (mounted) setLoading(false);
       }
-    } else {
-      setUserInfo(null);
     }
-  }, [jwt]);
+    fetchUser();
+    return () => { mounted = false; };
+  }, []);
 
-  const handleSignOut = () => {
-    localStorage.removeItem('jwt');
-    setJwt(null);
+  const handleSignOut = async () => {
+    // Call backend to clear the HttpOnly cookie
+    await fetch(`${API_URL}/logout`, { credentials: 'include', method: 'POST' });
     setUserInfo(null);
     router.push('/');
   };
 
-  if (!jwt) {
+  if (loading) {
+    return <div className="text-gray-500 dark:text-gray-300 text-sm">Loading...</div>;
+  }
+
+  // Only show sign-in if not authenticated
+  if (!userInfo) {
     return (
-      <div className="flex items-center justify-center">
-        <button
-          className="px-6 py-2 rounded font-semibold shadow-sm transition-colors duration-200 bg-[#4285F4] hover:bg-[#1a73e8] text-white font-roboto"
-          onClick={() => window.location.assign(`${API_URL}/auth/google`) }
+      <div className="flex gap-2">
+        <a
+          href={`${API_URL}/auth/google`}
+          className="px-4 py-1 rounded bg-blue-500 hover:bg-blue-700 text-white font-semibold text-sm shadow-sm"
         >
           Sign in with Google
-        </button>
+        </a>
       </div>
     );
   }
 
+  // Only show sign-out if authenticated
   return (
-    <div className="flex flex-col items-center gap-2">
-      <span className="text-green-700 dark:text-green-300 font-semibold">Signed in</span>
-      {userInfo && (
-        <span className="text-gray-700 dark:text-gray-200 text-sm">{userInfo.displayName || (userInfo.emails && userInfo.emails[0]?.value) || 'User'}</span>
-      )}
+    <div className="flex items-center gap-2">
+      <span className="text-green-700 dark:text-green-300 font-semibold text-sm">
+        {userInfo?.displayName || userInfo?.name || userInfo?.email || 'User'}
+      </span>
       <button
-        className="px-4 py-1 rounded bg-red-500 hover:bg-red-600 text-white font-semibold mt-2"
+        className="px-3 py-1 rounded bg-red-500 hover:bg-red-700 text-white font-semibold text-sm shadow-sm"
         onClick={handleSignOut}
       >
         Sign out

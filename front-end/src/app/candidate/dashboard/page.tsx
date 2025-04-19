@@ -45,7 +45,7 @@ export default function CandidateDashboard() {
 
   // Upload handler
   const handleUploadResume = async (file: File) => {
-    if (!jwt) return;
+    
     setUploading(true);
     setAddDisabled(true);
     setSelectedSkills([]); // Clear filters on upload
@@ -53,10 +53,7 @@ export default function CandidateDashboard() {
     formData.append('pdf', file);
     try {
       await axios.post(`${API_URL}/resumes/upload`, formData, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          'Content-Type': 'multipart/form-data',
-        },
+        withCredentials: true,
       });
       await fetchResumes();
     } catch (err) {
@@ -70,10 +67,10 @@ export default function CandidateDashboard() {
 
   // Fetch all resumes
   const fetchResumes = async () => {
-    if (!jwt) return;
+    
     try {
       const res = await axios.get(`${API_URL}/resumes`, {
-        headers: { Authorization: `Bearer ${jwt}` },
+        withCredentials: true,
       });
       // Normalize backend fields to frontend expectations
       const normalized = (res.data as Array<Record<string, unknown>>).map(r => ({
@@ -96,27 +93,32 @@ export default function CandidateDashboard() {
     }
   };
 
-
-  const [jwt, setJwt] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const match = document.cookie.match(/(?:^|; )jwt=([^;]*)/);
-      const cookieJwt = match ? decodeURIComponent(match[1]) : null;
-      setJwt(cookieJwt);
-      setLoading(false);
-    }
+    fetch(`${API_URL}/me`, { credentials: 'include' })
+      .then(async (res) => {
+        if (res.ok) {
+          setUser(await res.json());
+        } else {
+          setUser(null);
+        }
+      })
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
   }, []);
-  
 
-  useEffect(() => { if (!loading && jwt) fetchResumes(); }, [jwt, loading, fetchResumes]);
+  useEffect(() => {
+    if (!loading && user) fetchResumes();
+  }, [user, loading]);
+
   if (loading) return <div>Loading...</div>;
-  if (!jwt) return <div>Please sign in to access your dashboard.</div>;
+  if (!user) return <div>Please sign in to access your dashboard.</div>;
 
   const handleDeleteResume = async (id: number): Promise<void> => {
     try {
-      await axios.delete(`${API_URL}/resumes/${id}`, { headers: { Authorization: `Bearer ${jwt}` } });
+      await axios.delete(`${API_URL}/resumes/${id}`, { withCredentials: true });
       fetchResumes();
     } catch (error) {
       console.error(error);
@@ -126,7 +128,7 @@ export default function CandidateDashboard() {
   const handleDownloadResume = async (id: number): Promise<void> => {
     try {
       const response = await axios.get(`${API_URL}/resumes/${id}/download`, {
-        headers: { Authorization: `Bearer ${jwt}` },
+        withCredentials: true,
         responseType: 'blob',
       });
       const url = URL.createObjectURL(response.data as Blob);

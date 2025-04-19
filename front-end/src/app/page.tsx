@@ -19,7 +19,7 @@ export default function Home() {
         </p>
       </header>
 
-      <section className="w-full max-w-md bg-white dark:bg-[#232326] rounded-lg shadow-md p-6 mb-10 transition-colors duration-300 font-roboto">
+      <section className="w-full max-w-md flex items-center justify-center bg-white dark:bg-[#232326] rounded-lg shadow-md p-6 mb-10 transition-colors duration-300 font-roboto">
         <AuthSection />
       </section>
 

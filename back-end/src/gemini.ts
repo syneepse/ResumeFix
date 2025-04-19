@@ -47,7 +47,7 @@ export async function extractResumeInfoWithGemini(resumeText: string): Promise<R
   if (match) {
     cleaned = match[0];
   }
-  console.log(cleaned);
+  // console.log(cleaned);
   try {
     return JSON.parse(cleaned);
   } catch (e) {
