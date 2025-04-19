@@ -53,7 +53,6 @@ dotenv.config();
 
 const app = express();
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN, credentials: true }));
-app.options('*', cors({ origin: process.env.FRONTEND_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(session({ secret: process.env.JWT_SECRET || 'supersecret', resave: false, saveUninitialized: false }));
