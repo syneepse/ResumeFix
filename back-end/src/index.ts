@@ -176,7 +176,7 @@ app.post('/resumes/upload', authenticateToken, (req: Request, res: Response, nex
       data: {
         user_id: user.id,
         filename: req.file.filename,
-        skills: extracted.skills ? JSON.stringify(extracted.skills) : null,
+        skills: extracted.skills ? JSON.stringify(extracted.skills) : "",
         name: extracted.name || null,
         email: extracted.email || null,
         phone: extracted.phone || null,

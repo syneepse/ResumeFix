@@ -2321,7 +2321,7 @@ export namespace Prisma {
     id: number
     user_id: number
     filename: string
-    skills: string | null
+    skills: string
     name: string | null
     email: string | null
     phone: string | null
@@ -2424,7 +2424,7 @@ export namespace Prisma {
       id: number
       user_id: number
       filename: string
-      skills: string | null
+      skills: string
       name: string | null
       email: string | null
       phone: string | null
@@ -3443,7 +3443,7 @@ export namespace Prisma {
     id?: IntFilter<"Resume"> | number
     user_id?: IntFilter<"Resume"> | number
     filename?: StringFilter<"Resume"> | string
-    skills?: StringNullableFilter<"Resume"> | string | null
+    skills?: StringFilter<"Resume"> | string
     name?: StringNullableFilter<"Resume"> | string | null
     email?: StringNullableFilter<"Resume"> | string | null
     phone?: StringNullableFilter<"Resume"> | string | null
@@ -3457,7 +3457,7 @@ export namespace Prisma {
     id?: SortOrder
     user_id?: SortOrder
     filename?: SortOrder
-    skills?: SortOrderInput | SortOrder
+    skills?: SortOrder
     name?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
@@ -3474,7 +3474,7 @@ export namespace Prisma {
     NOT?: ResumeWhereInput | ResumeWhereInput[]
     user_id?: IntFilter<"Resume"> | number
     filename?: StringFilter<"Resume"> | string
-    skills?: StringNullableFilter<"Resume"> | string | null
+    skills?: StringFilter<"Resume"> | string
     name?: StringNullableFilter<"Resume"> | string | null
     email?: StringNullableFilter<"Resume"> | string | null
     phone?: StringNullableFilter<"Resume"> | string | null
@@ -3488,7 +3488,7 @@ export namespace Prisma {
     id?: SortOrder
     user_id?: SortOrder
     filename?: SortOrder
-    skills?: SortOrderInput | SortOrder
+    skills?: SortOrder
     name?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
@@ -3509,7 +3509,7 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"Resume"> | number
     user_id?: IntWithAggregatesFilter<"Resume"> | number
     filename?: StringWithAggregatesFilter<"Resume"> | string
-    skills?: StringNullableWithAggregatesFilter<"Resume"> | string | null
+    skills?: StringWithAggregatesFilter<"Resume"> | string
     name?: StringNullableWithAggregatesFilter<"Resume"> | string | null
     email?: StringNullableWithAggregatesFilter<"Resume"> | string | null
     phone?: StringNullableWithAggregatesFilter<"Resume"> | string | null
@@ -3591,7 +3591,7 @@ export namespace Prisma {
 
   export type ResumeCreateInput = {
     filename: string
-    skills?: string | null
+    skills: string
     name?: string | null
     email?: string | null
     phone?: string | null
@@ -3605,7 +3605,7 @@ export namespace Prisma {
     id?: number
     user_id: number
     filename: string
-    skills?: string | null
+    skills: string
     name?: string | null
     email?: string | null
     phone?: string | null
@@ -3616,7 +3616,7 @@ export namespace Prisma {
 
   export type ResumeUpdateInput = {
     filename?: StringFieldUpdateOperationsInput | string
-    skills?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -3630,7 +3630,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     user_id?: IntFieldUpdateOperationsInput | number
     filename?: StringFieldUpdateOperationsInput | string
-    skills?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -3643,7 +3643,7 @@ export namespace Prisma {
     id?: number
     user_id: number
     filename: string
-    skills?: string | null
+    skills: string
     name?: string | null
     email?: string | null
     phone?: string | null
@@ -3654,7 +3654,7 @@ export namespace Prisma {
 
   export type ResumeUpdateManyMutationInput = {
     filename?: StringFieldUpdateOperationsInput | string
-    skills?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -3667,7 +3667,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     user_id?: IntFieldUpdateOperationsInput | number
     filename?: StringFieldUpdateOperationsInput | string
-    skills?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -4165,7 +4165,7 @@ export namespace Prisma {
 
   export type ResumeCreateWithoutUserInput = {
     filename: string
-    skills?: string | null
+    skills: string
     name?: string | null
     email?: string | null
     phone?: string | null
@@ -4177,7 +4177,7 @@ export namespace Prisma {
   export type ResumeUncheckedCreateWithoutUserInput = {
     id?: number
     filename: string
-    skills?: string | null
+    skills: string
     name?: string | null
     email?: string | null
     phone?: string | null
@@ -4218,7 +4218,7 @@ export namespace Prisma {
     id?: IntFilter<"Resume"> | number
     user_id?: IntFilter<"Resume"> | number
     filename?: StringFilter<"Resume"> | string
-    skills?: StringNullableFilter<"Resume"> | string | null
+    skills?: StringFilter<"Resume"> | string
     name?: StringNullableFilter<"Resume"> | string | null
     email?: StringNullableFilter<"Resume"> | string | null
     phone?: StringNullableFilter<"Resume"> | string | null
@@ -4284,7 +4284,7 @@ export namespace Prisma {
   export type ResumeCreateManyUserInput = {
     id?: number
     filename: string
-    skills?: string | null
+    skills: string
     name?: string | null
     email?: string | null
     phone?: string | null
@@ -4295,7 +4295,7 @@ export namespace Prisma {
 
   export type ResumeUpdateWithoutUserInput = {
     filename?: StringFieldUpdateOperationsInput | string
-    skills?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -4307,7 +4307,7 @@ export namespace Prisma {
   export type ResumeUncheckedUpdateWithoutUserInput = {
     id?: IntFieldUpdateOperationsInput | number
     filename?: StringFieldUpdateOperationsInput | string
-    skills?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -4319,7 +4319,7 @@ export namespace Prisma {
   export type ResumeUncheckedUpdateManyWithoutUserInput = {
     id?: IntFieldUpdateOperationsInput | number
     filename?: StringFieldUpdateOperationsInput | string
-    skills?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
