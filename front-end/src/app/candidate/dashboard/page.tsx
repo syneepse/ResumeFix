@@ -34,6 +34,8 @@ export default function CandidateDashboard() {
   const [filteredResumes, setFilteredResumes] = useState<Resume[]>([]);
   const [resumes, setResumes] = useState<Resume[]>([]); // <-- moved up
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [user, setUser] = useState<User | null>(null);
+const [loading, setLoading] = useState(true);
 
   // Keep filteredResumes in sync with resumes if no skills are selected
   React.useEffect(() => {
@@ -74,38 +76,38 @@ export default function CandidateDashboard() {
   };
 
   // Fetch all resumes
-  const fetchResumes = async () => {
-    console.log('[fetchResumes] Called. user:', user);
-    if (!user?.email) {
-      console.warn('[fetchResumes] No user or user.email, aborting fetch. user:', user, typeof(user));  
-      return;
-    }
-    try {
-      console.log('[fetchResumes] Fetching resumes for user.email:', user.email);
-      const res = await axios.get(`${API_URL}/resumes`, {
-        headers: { 'x-user-id': user.email },
-      });
-      console.log('[fetchResumes] API response:', res);
-      // Normalize backend fields to frontend expectations
-      const normalized = (res.data as Array<Record<string, unknown>>).map(r => ({
-        id: r["id"] as number,
-        name: r["name"] as string ?? "",
-        email: r["email"] as string ?? "",
-        phone: r["phone"] as string ?? "",
-        fileName: r["filename"] as string ?? "",
-        uploadDate: r["upload_date"] as string ?? "",
-        skills: (r["skills"] as string[]) ?? [],
-        summary: r["summary"] as string ?? "",
-        work_experience: r["work_experience"] as string ?? "",
-        matchedSkills: (r["matchedSkills"] as string[]) ?? [],
-        rating: r["rating"] as string ?? "",
-      }));
+  const fetchResumes = React.useCallback(async () => {
+  console.log('[fetchResumes] Called. user:', user);
+  if (!user?.email) {
+    console.warn('[fetchResumes] No user or user.email, aborting fetch. user:', user, typeof(user));  
+    return;
+  }
+  try {
+    console.log('[fetchResumes] Fetching resumes for user.email:', user.email);
+    const res = await axios.get(`${API_URL}/resumes`, {
+      headers: { 'x-user-id': user.email },
+    });
+    console.log('[fetchResumes] API response:', res);
+    // Normalize backend fields to frontend expectations
+    const normalized = (res.data as Array<Record<string, unknown>>).map(r => ({
+      id: r["id"] as number,
+      name: r["name"] as string ?? "",
+      email: r["email"] as string ?? "",
+      phone: r["phone"] as string ?? "",
+      fileName: r["filename"] as string ?? "",
+      uploadDate: r["upload_date"] as string ?? "",
+      skills: (r["skills"] as string[]) ?? [],
+      summary: r["summary"] as string ?? "",
+      work_experience: r["work_experience"] as string ?? "",
+      matchedSkills: (r["matchedSkills"] as string[]) ?? [],
+      rating: r["rating"] as string ?? "",
+    }));
 
-      setResumes(normalized);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    setResumes(normalized);
+  } catch (err) {
+    console.error(err);
+  }
+}, [user, API_URL]);
 
   interface User {
   id?: string;
@@ -113,8 +115,7 @@ export default function CandidateDashboard() {
   email: string;
   image?: string;
 }
-const [user, setUser] = useState<User | null>(null);
-const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     fetch(`/api/me`, { credentials: 'include' })
@@ -136,9 +137,9 @@ const [loading, setLoading] = useState(true);
   }, []);
 
   useEffect(() => {
-    console.log('[useEffect user, loading] loading:', loading, 'user:', user);
-    if (!loading && user) fetchResumes();
-  }, [user, loading]);
+  console.log('[useEffect user, loading] loading:', loading, 'user:', user);
+  if (!loading && user) fetchResumes();
+}, [user, loading, fetchResumes]);
 
   if (loading) return <div>Loading...</div>;
   if (!user) return <div>Please sign in to access your dashboard.</div>;

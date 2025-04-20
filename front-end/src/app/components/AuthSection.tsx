@@ -2,8 +2,6 @@
 // src/app/components/AuthSection.tsx
 import { useSession, signIn, signOut } from "next-auth/react";
 
-// const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-
 export default function AuthSection() {
   const { data: session, status } = useSession();
 
@@ -24,9 +22,6 @@ export default function AuthSection() {
 
   return (
     <div className="flex gap-2 items-center">
-      {session.user?.image && (
-        <img src={session.user.image} alt="avatar" className="w-8 h-8 rounded-full" />
-      )}
       <span className="text-gray-800 dark:text-gray-200 text-sm font-semibold">{session.user?.name || session.user?.email}</span>
       <button
         onClick={() => signOut({ callbackUrl: "/" })}
