@@ -1,81 +1,37 @@
 "use client";
 // src/app/components/AuthSection.tsx
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 // const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function AuthSection() {
-  interface UserInfo {
-    displayName?: string;
-    emails?: { value: string }[];
-    name?: string;
-    email?: string;
-    picture?: string;
-    [key: string]: unknown;
-  }
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const { data: session, status } = useSession();
 
-  // Only fetch user info once on mount
-  useEffect(() => {
-    let mounted = true;
-    async function fetchUser() {
-      try {
-        const res = await fetch(`/api/me`, {
-          credentials: 'include',
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (mounted) setUserInfo(data);
-        } else {
-          if (mounted) setUserInfo(null);
-        }
-      } catch {
-        if (mounted) setUserInfo(null);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-    fetchUser();
-    return () => { mounted = false; };
-  }, []);
-
-  const handleSignOut = async () => {
-    // Call backend to clear the HttpOnly cookie
-    await fetch(`/api/logout`, { credentials: 'include', method: 'POST' });
-    setUserInfo(null);
-    router.push('/');
-  };
-
-  if (loading) {
+  if (status === "loading") {
     return <div className="text-gray-500 dark:text-gray-300 text-sm">Loading...</div>;
   }
 
-  // Only show sign-in if not authenticated
-  if (!userInfo) {
+  if (!session) {
     return (
-      <div className="flex gap-2">
-        <a
-          href={`/api/auth/google`}
-          className="px-4 py-1 rounded bg-blue-500 hover:bg-blue-700 text-white font-semibold text-sm shadow-sm"
-        >
-          Sign in with Google
-        </a>
-      </div>
+      <button
+        onClick={() => signIn("google", { callbackUrl: "/candidate/dashboard" })}
+        className="px-4 py-1 rounded bg-blue-500 hover:bg-blue-700 text-white font-semibold text-sm shadow-sm"
+      >
+        Sign in with Google
+      </button>
     );
   }
 
-  // Only show sign-out if authenticated
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-green-700 dark:text-green-300 font-semibold text-sm">
-        {userInfo?.displayName || userInfo?.name || userInfo?.email || 'User'}
-      </span>
+    <div className="flex gap-2 items-center">
+      {session.user?.image && (
+        <img src={session.user.image} alt="avatar" className="w-8 h-8 rounded-full" />
+      )}
+      <span className="text-gray-800 dark:text-gray-200 text-sm font-semibold">{session.user?.name || session.user?.email}</span>
       <button
-        className="px-3 py-1 rounded bg-red-500 hover:bg-red-700 text-white font-semibold text-sm shadow-sm"
-        onClick={handleSignOut}
+        onClick={() => signOut({ callbackUrl: "/" })}
+
+        className="ml-2 px-3 py-1 rounded bg-red-500 hover:bg-red-700 text-white font-semibold text-sm shadow-sm"
       >
         Sign out
       </button>

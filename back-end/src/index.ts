@@ -16,6 +16,7 @@ import path from 'path';
 import pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
 import { extractResumeInfoWithGemini } from './gemini';
+import { authenticateToken } from './middleware/auth';
 
 const prisma = new PrismaClient();
 
@@ -55,91 +56,14 @@ const app = express();
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(session({ secret: process.env.JWT_SECRET || 'supersecret', resave: false, saveUninitialized: false }));
+app.use(session({ secret: process.env.JWT_SECRET??'supersecret', resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 
-// Updated authenticateToken middleware to read JWT from cookie
-function authenticateToken(req: Request, res: Response, next: NextFunction): void {
-  const token = req.cookies.jwt;
-  if (!token) {
-    res.status(401).json({ error: 'Missing token' });
-    return;
-  }
-  jwt.verify(token, JWT_SECRET, (err: unknown, user: unknown) => {
-    if (err) {
-      res.status(403).json({ error: 'Invalid token' });
-      return;
-    }
-    (req as any).user = user;
-    next();
-  });
-}
-
-// Passport Google OAuth2 setup
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID!,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-  callbackURL: process.env.GOOGLE_CALLBACK_URL!,
-}, async (accessToken: string, refreshToken: string, profile: Profile, done) => {
-  try {
-    const user = await prisma.account.upsert({
-      where: { google_id: profile.id },
-      update: {
-        email: profile.emails?.[0]?.value,
-        name: profile.displayName,
-        avatar_url: profile.photos?.[0]?.value,
-        last_login: new Date(),
-      },
-      create: {
-        google_id: profile.id,
-        email: profile.emails?.[0]?.value || '',
-        name: profile.displayName,
-        avatar_url: profile.photos?.[0]?.value,
-        created_at: new Date(),
-        last_login: new Date(),
-      }
-    });
-    return done(null, user);
-  } catch (error) {
-    return done(error, undefined);
-  }
-}));
-
-passport.serializeUser((user: Express.User, done: (err: any, id?: unknown) => void) => {
-  done(null, user);
-});
-passport.deserializeUser((user: Express.User, done: (err: any, user?: Express.User | false | null) => void) => {
-  done(null, user);
-});
-
-// Google OAuth2 routes
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req: Request, res: Response) => {
-  // On successful auth, issue JWT and set as HttpOnly cookie, then redirect to frontend dashboard
-  const user = (req as any).user;
-  const payload = {
-    id: user.id,
-    displayName: user.name,
-    email: user.email,
-    picture: user.avatar_url,
-  };
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '2h' });
-  res.cookie('jwt', token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'lax',
-    maxAge: 2 * 60 * 60 * 1000,
-    path: '/',
-  });
-  res.redirect((process.env.FRONTEND_ORIGIN || 'http://localhost:3000') + '/candidate/dashboard');
-});
 
 // POST /resumes/upload – Upload a PDF and save metadata
-app.post('/resumes/upload', authenticateToken, (req: Request, res: Response, next: NextFunction) => {
+app.post('/resumes/upload', (req: Request, res: Response, next: NextFunction) => {
   upload.single('pdf')(req, res, function (err) {
     if (err instanceof multer.MulterError) {
       if (err.code === 'LIMIT_FILE_SIZE') {
@@ -153,7 +77,11 @@ app.post('/resumes/upload', authenticateToken, (req: Request, res: Response, nex
   });
 }, async (req: Request, res: Response) => {
   try {
-    const user = (req as any).user;
+    const userEmail = req.headers['x-user-id'];
+    if (!userEmail) {
+      res.status(401).json({ error: 'No user email provided' });
+      return;
+    }
     if (!req.file) {
       res.status(400).json({ error: 'No file uploaded' });
       return;
@@ -168,7 +96,8 @@ app.post('/resumes/upload', authenticateToken, (req: Request, res: Response, nex
         resumeText = pdfData.text;
       } catch (pdfErr) {
         console.error('PDF parse error:', pdfErr);
-        res.status(400).json({ error: 'Failed to parse PDF. Please upload a valid PDF file.' });
+        res.status(400).json({ error: 'Failed to parse PDF file' });
+        return;
       }
     } else if (
       req.file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
@@ -197,6 +126,13 @@ app.post('/resumes/upload', authenticateToken, (req: Request, res: Response, nex
       extracted = {};
     }
 
+    // Find the user by email
+    const user = await prisma.account.findUnique({ where: { email: userEmail as string } });
+    if (!user) {
+      res.status(404).json({ error: 'No user found with this email' });
+      return;
+    }
+
     // Save metadata & extracted info to DB
     const resume = await prisma.resume.create({
       data: {
@@ -222,11 +158,16 @@ app.post('/resumes/upload', authenticateToken, (req: Request, res: Response, nex
 });
 
 // GET /resumes – Fetch all resumes for the authenticated user
-app.get('/resumes', authenticateToken, async (req: Request, res: Response) => {
+app.get('/resumes', async (req: Request, res: Response) => {
   try {
-    const user = (req as any).user;
+    const userEmailHeader = req.headers['x-user-id'];
+    const userEmail = Array.isArray(userEmailHeader) ? userEmailHeader[0] : userEmailHeader;
+    if (!userEmail) {
+      res.status(401).json({ error: 'No user email provided' });
+      return;
+    }
     const resumes = await prisma.resume.findMany({
-      where: { user_id: user.id },
+      where: { user: { email: userEmail } },
       orderBy: { upload_date: 'desc' }
     });
 
@@ -241,11 +182,16 @@ app.get('/resumes', authenticateToken, async (req: Request, res: Response) => {
 });
 
 // GET /resumes/:id/download – Download a specific PDF
-app.get('/resumes/:id/download', authenticateToken, async (req: Request, res: Response) => {
+app.get('/resumes/:id/download', async (req: Request, res: Response) => {
   try {
-    const user = (req as any).user;
+    const userEmailHeader = req.headers['x-user-id'];
+    const userEmail = Array.isArray(userEmailHeader) ? userEmailHeader[0] : userEmailHeader;
+    if (!userEmail) {
+      res.status(401).json({ error: 'No user email provided' });
+      return;
+    }
     const resume = await prisma.resume.findFirst({
-      where: { id: parseInt(req.params.id), user_id: user.id }
+      where: { id: parseInt(req.params.id), user: { email: userEmail } }
     });
     if (!resume) {
       res.status(404).json({ error: 'Resume not found' });
@@ -262,30 +208,31 @@ app.get('/resumes/:id/download', authenticateToken, async (req: Request, res: Re
   }
 });
 
-app.delete('/resumes/:id', authenticateToken, async (req: Request, res: Response) => {
+app.delete('/resumes/:id', async (req: Request, res: Response) => {
   try {
-    const user = (req as any).user;
+    const userEmailHeader = req.headers['x-user-id'];
+    const userEmail = Array.isArray(userEmailHeader) ? userEmailHeader[0] : userEmailHeader;
+    if (!userEmail) {
+      res.status(401).json({ error: 'No user email provided' });
+      return;
+    }
     const resume = await prisma.resume.findFirst({
-      where: { id: parseInt(req.params.id), user_id: user.id }
+      where: { id: parseInt(req.params.id), user: { email: userEmail } }
     });
     if (!resume) {
       res.status(404).json({ error: 'Resume not found' });
       return;
     }
     // Delete the file from disk and ensure it is removed
-    const filePath = path.join(uploadDir, resume.filename);
-    if (fs.existsSync(filePath)) {
+    if (resume.filename) {
+      const filePath = path.join(uploadDir, resume.filename);
       try {
-        fs.unlinkSync(filePath);
-        // Double-check the file is gone
         if (fs.existsSync(filePath)) {
-          console.error(`Failed to delete file: ${filePath}`);
-          res.status(500).json({ error: 'Failed to delete resume file from disk.' });
-          return;
+          fs.unlinkSync(filePath);
         }
       } catch (fileErr) {
-        console.error(`Error deleting file ${filePath}:`, fileErr);
-        res.status(500).json({ error: 'Error deleting resume file from disk.', detail: fileErr });
+        console.error(`Failed to delete file: ${filePath}`);
+        res.status(500).json({ error: 'Failed to delete resume file from disk.' });
         return;
       }
     }
@@ -296,17 +243,17 @@ app.delete('/resumes/:id', authenticateToken, async (req: Request, res: Response
   }
 });
 
-
-
-// (Optional) POST /match endpoint can be updated later as needed.
-
-
 // GET /resumes/:id – Fetch all extracted fields for a specific resume
-app.get('/resumes/:id', authenticateToken, async (req: Request, res: Response) => {
+app.get('/resumes/:id', async (req: Request, res: Response) => {
   try {
-    const user = (req as any).user;
+    const userEmailHeader = req.headers['x-user-id'];
+    const userEmail = Array.isArray(userEmailHeader) ? userEmailHeader[0] : userEmailHeader;
+    if (!userEmail) {
+      res.status(401).json({ error: 'No user email provided' });
+      return;
+    }
     const resume = await prisma.resume.findFirst({
-      where: { id: parseInt(req.params.id), user_id: user.id }
+      where: { id: parseInt(req.params.id), user: { email: userEmail } }
     });
     if (!resume) {
       res.status(404).json({ error: 'Resume not found' });
@@ -331,32 +278,6 @@ app.get('/resumes/:id', authenticateToken, async (req: Request, res: Response) =
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch resume', detail: err });
   }
-});
-
-// --- /me endpoint: return user info if authenticated ---
-app.get('/me', (req: Request, res: Response) => {
-  // Debug logging for authentication issues
-  console.log('Cookies:', req.cookies);
-  console.log('JWT Secret:', JWT_SECRET);
-  console.log('Token:', req.cookies.jwt);
-  const token = req.cookies.jwt;
-  if (!token) {res.status(401).json({ error: 'Not authenticated' }); return;}
-  jwt.verify(token, JWT_SECRET, (err: unknown, user: unknown) => {
-    if (err || !user || typeof user !== 'object') {res.status(401).json({ error: 'Invalid token' }); return;}
-    const { id, displayName, email, picture } = user as { id?: string, displayName?: string, email?: string, picture?: string };
-    res.json({ id, displayName, email, picture });
-  });
-});
-
-// --- /logout endpoint: clear JWT cookie ---
-app.post('/logout', (req: Request, res: Response) => {
-  res.clearCookie('jwt', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    path: '/',
-  });
-  res.json({ message: 'Logged out' });
 });
 
 if (process.env.NODE_ENV !== 'test') {

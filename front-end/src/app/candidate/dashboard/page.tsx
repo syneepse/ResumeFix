@@ -8,7 +8,6 @@ import { AddResumeIcon, CloseIcon } from "./icons";
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import React from 'react';
-const API_URL = process.env.NEXT_PUBLIC_API_URL; // now points to Express backend
 
 type Resume = {
   id: number;
@@ -43,18 +42,27 @@ export default function CandidateDashboard() {
     }
   }, [resumes, selectedSkills]);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   // Upload handler
   const handleUploadResume = async (file: File) => {
-    
+    console.log('[handleUploadResume] User:', user);
+    if (!user?.email) {
+      console.warn('[handleUploadResume] No user or user.email, aborting upload. user:', user );
+      return;
+    }
+
     setUploading(true);
     setAddDisabled(true);
     setSelectedSkills([]); // Clear filters on upload
     const formData = new FormData();
     formData.append('pdf', file);
     try {
-      await axios.post(`${API_URL}/resumes/upload`, formData, {
-        withCredentials: true,
+      console.log('[handleUploadResume] Uploading resume for user.email:', user.email);
+      const uploadRes = await axios.post(`${API_URL}/resumes/upload`, formData, {
+        headers: { 'x-user-id': user.email },
       });
+      console.log('[handleUploadResume] Upload response:', uploadRes);
       await fetchResumes();
     } catch (err) {
       console.error('Upload failed', err);
@@ -67,11 +75,17 @@ export default function CandidateDashboard() {
 
   // Fetch all resumes
   const fetchResumes = async () => {
-    
+    console.log('[fetchResumes] Called. user:', user);
+    if (!user?.email) {
+      console.warn('[fetchResumes] No user or user.email, aborting fetch. user:', user, typeof(user));  
+      return;
+    }
     try {
+      console.log('[fetchResumes] Fetching resumes for user.email:', user.email);
       const res = await axios.get(`${API_URL}/resumes`, {
-        withCredentials: true,
+        headers: { 'x-user-id': user.email },
       });
+      console.log('[fetchResumes] API response:', res);
       // Normalize backend fields to frontend expectations
       const normalized = (res.data as Array<Record<string, unknown>>).map(r => ({
         id: r["id"] as number,
@@ -95,27 +109,34 @@ export default function CandidateDashboard() {
 
   interface User {
   id?: string;
-  displayName?: string;
-  email?: string;
-  picture?: string;
+  name: string;
+  email: string;
+  image?: string;
 }
 const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_URL}/me`, { credentials: 'include' })
+    fetch(`/api/me`, { credentials: 'include' })
       .then(async (res) => {
         if (res.ok) {
-          setUser(await res.json());
+          const userObj = await res.json();
+          console.log('[useEffect /api/me] Got user:', userObj);
+          setUser(userObj.user);
         } else {
+          console.log('[useEffect /api/me] Not authenticated');
           setUser(null);
         }
       })
-      .catch(() => setUser(null))
+      .catch((e) => {
+        console.error('[useEffect /api/me] Error:', e);
+        setUser(null);
+      })
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
+    console.log('[useEffect user, loading] loading:', loading, 'user:', user);
     if (!loading && user) fetchResumes();
   }, [user, loading]);
 
@@ -123,8 +144,11 @@ const [user, setUser] = useState<User | null>(null);
   if (!user) return <div>Please sign in to access your dashboard.</div>;
 
   const handleDeleteResume = async (id: number): Promise<void> => {
+    if (!user?.email) return;
     try {
-      await axios.delete(`/api/resumes/${id}`, { withCredentials: true });
+      await axios.delete(`${API_URL}/resumes/${id}`, {
+        headers: { 'x-user-id': user.email },
+      });
       fetchResumes();
     } catch (error) {
       console.error(error);
@@ -132,9 +156,10 @@ const [user, setUser] = useState<User | null>(null);
   };
 
   const handleDownloadResume = async (id: number): Promise<void> => {
+    if (!user?.email) return;
     try {
-      const response = await axios.get(`/api/resumes/${id}/download`, {
-        withCredentials: true,
+      const response = await axios.get(`${API_URL}/resumes/${id}/download`, {
+        headers: { 'x-user-id': user.email },
         responseType: 'blob',
       });
       const url = URL.createObjectURL(response.data as Blob);
