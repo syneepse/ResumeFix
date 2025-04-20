@@ -126,11 +126,18 @@ app.post('/resumes/upload', (req: Request, res: Response, next: NextFunction) =>
       extracted = {};
     }
 
-    // Find the user by email
-    const user = await prisma.account.findUnique({ where: { email: userEmail as string } });
+    // Find or create the user by email
+    let user = await prisma.account.findUnique({ where: { email: userEmail as string } });
     if (!user) {
-      res.status(404).json({ error: 'No user found with this email' });
-      return;
+      // Try to use extracted fields for name and avatar if available
+      user = await prisma.account.create({
+        data: {
+          email: userEmail as string,
+          google_id: userEmail as string, // fallback, ideally should be Google ID
+          name: extracted.name || null,
+          avatar_url: extracted.avatar_url || null,
+        }
+      });
     }
 
     // Save metadata & extracted info to DB
