@@ -1,5 +1,8 @@
 # Resume Skill Extractor
 
+##DEMO - 
+https://resume-fix-csfirst.windsurf.build/
+
 ## Overview
 Resume Skill Extractor is a full-stack web application for uploading, analyzing, and managing resumes. It leverages AI to extract skills, work experience, and summaries from resumes, helping job seekers optimize their applications and enabling hiring managers to efficiently filter candidates.
 
