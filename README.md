@@ -1,6 +1,6 @@
 # Resume Skill Extractor
 
-##DEMO - 
+## DEMO - 
 https://resume-fix-csfirst.windsurf.build/
 
 ## Overview
